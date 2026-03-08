@@ -1,4 +1,6 @@
 source("fonctions_tidyverse.R")
+source("prep_W.R")
+source("prep_data_2020.R")
 
 theta_current <- NULL
 output <- list()
