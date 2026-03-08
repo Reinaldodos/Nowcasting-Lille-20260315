@@ -1,11 +1,12 @@
 prepare_live_from_long <- function(live_long, category_names) {
+  data.table::setDT(live_long)
   stopifnot(all(c("bureau_id", "liste", "voix") %in% names(live_long)))
 
   # agrégation défensive au cas où une ligne serait dupliquée
   live_agg <- live_long[
     ,
-    .(voix = sum(voix, na.rm = TRUE)),
-    by = .(bureau_id, liste)
+    list(voix = sum(voix, na.rm = TRUE)),
+    by = list(bureau_id, liste)
   ]
 
   # passage en large

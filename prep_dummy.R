@@ -1,11 +1,13 @@
 live_long <-
   meta_all |>
-  sample_frac(size = 0.1) |>
+  arrange(N) |>
+  slice(1:nb_obs) |>
   semi_join(
     x = inscrits,
     by = join_by(bureau_id)
   )
 
-category_names <- live_long$liste |>
+category_names <-
+  live_long$liste |>
   unique() |>
   sort()

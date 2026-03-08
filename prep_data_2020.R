@@ -4,8 +4,11 @@ test_data <-
   "https://tabular-api.data.gouv.fr/api/resources/8fb977b3-57be-44b9-bd8e-ef0a130a003d/data/json/" |>
   jsonlite::read_json(simplifyVector = TRUE) |>
   filter(numero_tour == 1) |>
-  mutate(code_bdv = str_pad(string = `__id`, width = 3, side = "left", pad = "0")) |>
-  mutate(bureau_id = str_c("59_350", code_bdv))
+  mutate(code_bdv = str_pad(string = `__id`, width = 4, side = "left", pad = "0")) |>
+  mutate(bureau_id = str_c("59_350_", code_bdv)) |>
+  slice(1:nrow(arch))
+
+test_data$bureau_id <- arch$geo_id
 
 meta_all <-
   test_data |>
