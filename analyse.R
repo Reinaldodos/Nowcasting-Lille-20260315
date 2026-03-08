@@ -43,6 +43,7 @@ delta_projections |>
 
 delta_projections |>
   filter(nb_bureaux_obs == max(nb_bureaux_obs)) |>
+  view() |>
   ggplot(mapping = aes(x = voix_reel, y = voix_proj, colour = liste)) +
   geom_point() +
   geom_abline()
