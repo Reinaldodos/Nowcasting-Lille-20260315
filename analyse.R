@@ -8,7 +8,7 @@ projections <-
   output |>
   bind_rows(.id = "nb_bureaux_obs") |>
   inner_join(y = meta_all) |>
-  mutate(voix = N * part_proj) |>
+  mutate(voix = N * part) |>
   summarise(
     voix_proj = sum(voix),
     .by = c(liste, nb_bureaux_obs)
@@ -36,13 +36,15 @@ delta_projections <-
   )
 
 delta_projections |>
-  ggplot(mapping = aes(x = nb_bureaux_obs, y = delta, colour = liste)) +
+  ggplot(mapping = aes(x = nb_bureaux_obs, y = ratio, colour = liste)) +
   geom_point() +
   geom_line() +
   theme(legend.position = "bottom")
 
 delta_projections |>
   filter(nb_bureaux_obs == max(nb_bureaux_obs)) |>
-  ggplot(mapping = aes(x = voix_reel, y = voix_proj, colour = liste)) +
+  arrange(-voix_reel) |>
+  force()
+ggplot(mapping = aes(x = voix_reel, y = voix_proj, colour = liste)) +
   geom_point() +
   geom_abline()
