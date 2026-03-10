@@ -1,3 +1,4 @@
+# nb_obs <- 20
 live_long <-
   meta_all |>
   arrange(N) |>
@@ -8,6 +9,6 @@ live_long <-
   )
 
 category_names <-
-  live_long$liste |>
+  unique(live_long$liste) |>
   unique() |>
   sort()

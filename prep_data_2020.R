@@ -16,12 +16,9 @@ meta_all <-
   distinct(bureau_id, N = nb_inscrits, nb_exprimes) |>
   readr::type_convert()
 
-resultats <-
+inscrits <-
   test_data |>
   mutate_all(.funs = as.character) |>
   select(bureau_id, candidat = candidats, voix) |>
-  readr::type_convert()
-
-inscrits <-
-  bind_rows(resultats) |>
+  readr::type_convert() |>
   rename(liste = candidat)
