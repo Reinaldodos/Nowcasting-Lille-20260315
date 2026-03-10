@@ -133,6 +133,8 @@ update_projection_long <- function(live_long,
                                    theta_prior = NULL) {
   stopifnot(all(c("bureau_id", "N") %in% names(meta_all)))
 
+  source(file = "fonctions_tidyverse.R")
+
   prep <- prepare_live_from_long(live_long, category_names)
   live_wide <- prep$live_wide
 

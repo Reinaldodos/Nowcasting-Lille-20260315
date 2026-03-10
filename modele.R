@@ -1,45 +1,60 @@
 source("prep_W.R")
-W_arch <- create_W(arch_file = archfile_9)
+source("fonctions_tidyverse.R")
 
-res <- NULL
+run_model_selon_k <- function(archfile,
+                              theta_current = NULL,
+                              lambda = 1e-4) {
+  source(file = "prep data live.R")
+  archfile |>
+    create_W() |>
+    update_projection_long(
+      live_long = live_long,
+      meta_all = meta_all,
+      category_names = listes
+    )
+}
 
-source(file = "fonctions_tidyverse.R")
+get_outputs_from_res <- function(res) {
+  nb_bdv_obs <- res$projection$observed_bureau_ids |> length()
 
-source(file = "prep data live.R")
-res <- update_projection_long(
-  live_long = live_long,
-  W = W_arch,
-  meta_all = meta_all,
-  category_names = listes,
-  theta_current = res$theta,
-  lambda = 1e-4
-)
+  bdv_proj <-
+    res$projection$wide |>
+    mutate(across(
+      .cols = all_of(listes),
+      .fns = ~ round(N * .)
+    ))
 
-res$projection$wide |>
-  mutate(across(
-    .cols = all_of(listes),
-    .fns = ~ round(N * .)
-  )) |>
-  DT::datatable()
+  output_inscrits <-
+    res$projection$long |>
+    inner_join(
+      x = meta_all,
+      by = join_by(bureau_id)
+    ) |>
+    mutate(voix_proj = round(part_proj * N)) |>
+    summarise(
+      voix_proj = sum(voix_proj, na.rm = TRUE),
+      .by = c(liste)
+    ) |>
+    mutate(exprimes = !liste %in% c("ABSTENTION", "B&N")) |>
+    arrange(-voix_proj)
 
-output_inscrits <-
-  res$projection$long |>
-  inner_join(
-    x = meta_all,
-    by = join_by(bureau_id)
-  ) |>
-  mutate(voix_proj = round(part_proj * N)) |>
-  summarise(
-    voix_proj = sum(voix_proj, na.rm = TRUE),
-    .by = c(liste)
-  ) |>
-  mutate(exprimes = !liste %in% c("ABSTENTION", "B&N")) |>
-  arrange(-voix_proj)
+  scores_exprimes <-
+    output_inscrits |>
+    filter(exprimes) |>
+    mutate(score = scales::percent(voix_proj / sum(voix_proj),
+      accuracy = .01
+    )) |>
+    select(-exprimes)
 
-output_inscrits |>
-  filter(exprimes) |>
-  mutate(score = scales::percent(voix_proj / sum(voix_proj),
-    accuracy = .01
-  )) |>
-  select(-exprimes) |>
-  gt::gt()
+  list(
+    "modele" = res,
+    "nb bureaux observés" = nb_bdv_obs,
+    "projection par bureau" = bdv_proj,
+    "résultats" = output_inscrits,
+    "scores par liste" = scores_exprimes
+  )
+}
+
+archfile_5 |>
+  run_model_selon_k() |>
+  get_outputs_from_res()

@@ -1,8 +1,10 @@
 url <- "https://docs.google.com/spreadsheets/d/1cIiW13JaqudBTFH_Nz23mZhQXeuhXbjASk2SGsVwBX0/edit?usp=sharing"
 
+# url <- "https://docs.google.com/spreadsheets/d/1moiNM2Mlp4wkrPX6bJusTGBMDNFSdeQfYXN2lYkfbik/edit?gid=2142927731#gid=2142927731"
+
 raw_data <-
   googlesheets4::read_sheet(
-    ss = url, sheet = 1, skip = 2
+    ss = url, sheet = 1, skip = 2, n_max = 126
   )
 
 listes <- c("ABSTENTION", colnames(raw_data)[c(6, 8:16)])

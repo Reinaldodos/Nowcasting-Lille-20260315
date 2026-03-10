@@ -1,0 +1,155 @@
+---
+title: "Projection municipale selon k"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    theme: cosmo
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r global, include=FALSE}
+library(tidyverse)
+library(flexdashboard)
+library(DT)
+library(gt)
+library(scales)
+
+source("modele.R")
+
+res_k5 <- run_model_selon_k(
+  archfile = archfile_5
+)
+
+res_k9 <- run_model_selon_k(
+  archfile = archfile_5
+)
+
+out_k5 <- get_outputs_from_res(res_k5)
+out_k9 <- get_outputs_from_res(res_k9)
+```
+
+# k = 5
+
+## Row
+
+### Bureaux observés
+
+```{r, echo=FALSE}
+valueBox(
+  value = out_k5[["nb bureaux observés"]],
+  caption = "Bureaux observés",
+  icon = "fa-check"
+)
+```
+
+## Row
+### Scores par liste
+
+```{r}
+out_k5[["scores par liste"]] |>
+  DT::datatable()
+```
+
+
+### Résultats projetés
+
+```{r}
+out_k5[["résultats"]] |>
+  DT::datatable()
+```
+
+## Row
+### Projection par bureau
+
+```{r}
+datatable(
+  out_k5[["projection par bureau"]],
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE
+  )
+)
+```
+
+# k = 9
+
+## Row
+
+### Bureaux observés
+
+```{r}
+valueBox(
+  value = out_k9[["nb bureaux observés"]],
+  caption = "Bureaux observés",
+  icon = "fa-check"
+)
+```
+
+## Row
+### Scores par liste
+
+```{r}
+out_k9[["scores par liste"]] |>
+  DT::datatable()
+```
+
+
+### Résultats projetés
+
+```{r}
+out_k9[["résultats"]] |>
+  DT::datatable()
+```
+
+## Row
+### Projection par bureau
+
+```{r}
+datatable(
+  out_k9[["projection par bureau"]],
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE
+  )
+)
+```
+
+# Comparaison
+
+## Row
+
+### Scores comparés
+
+```{r}
+comp_scores <- 
+  list("k_5"=out_k5,
+       "k_9"=out_k9) |> 
+  map(.f = ~.[["scores par liste"]]) |> 
+  bind_rows(.id = "k")
+
+comp_scores |>
+  select(-voix_proj) |> 
+  pivot_wider(names_from = k, values_from = score, names_prefix = "score_") |> 
+  gt()
+```
+
+### Résultats comparés
+
+```{r}
+comp_res <- 
+  list("k_5"=out_k5,
+       "k_9"=out_k9) |> 
+  map(.f = ~.[["résultats"]]) |> 
+  bind_rows(.id = "k")
+
+comp_res |> 
+  select(-exprimes) |> 
+  pivot_wider(names_from = k, values_from = voix_proj, names_prefix = "voix_") |> 
+  gt()
+```
