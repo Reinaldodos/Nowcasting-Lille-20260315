@@ -1,11 +1,13 @@
 ---
-title: "Projection municipale selon k"
+title: "Projection municipale — `r if(!is.null(params$timestamp)) format(params$timestamp, '%d/%m/%Y %H:%M:%S') else ''`"
+subtitle: "Dernière mise à jour : `r format(params$timestamp, '%d/%m %H:%M:%S')`"
 output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: fill
     theme: cosmo
-runtime: shiny
+params:
+  timestamp: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -20,14 +22,14 @@ library(DT)
 library(gt)
 library(scales)
 
-source("modele.R")
+source("build/modele.R")
 
 res_k5 <- run_model_selon_k(
   archfile = archfile_5
 )
 
 res_k9 <- run_model_selon_k(
-  archfile = archfile_5
+  archfile = archfile_9
 )
 
 out_k5 <- get_outputs_from_res(res_k5)
