@@ -1,10 +1,10 @@
-source("prep_W.R")
-source("fonctions_tidyverse.R")
+source("build/prep_W.R")
+source("fonctions/fonctions_tidyverse.R")
+source(file = "build/prep data live.R")
 
 run_model_selon_k <- function(archfile,
                               theta_current = NULL,
                               lambda = 1e-4) {
-  source(file = "prep data live.R")
   archfile |>
     create_W() |>
     update_projection_long(
