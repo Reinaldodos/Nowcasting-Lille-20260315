@@ -2,7 +2,10 @@ source("build/prep_W.R")
 source("fonctions/fonctions_tidyverse.R")
 source(file = "build/prep data live.R")
 
-run_model_selon_k <- function(archfile,
+run_model_selon_k <- function(live_long,
+                              meta_all,
+                              listes,
+                              archfile,
                               theta_current = NULL,
                               lambda = 1e-4) {
   archfile |>
@@ -54,7 +57,3 @@ get_outputs_from_res <- function(res) {
     "scores par liste" = scores_exprimes
   )
 }
-
-archfile_5 |>
-  run_model_selon_k() |>
-  get_outputs_from_res()
