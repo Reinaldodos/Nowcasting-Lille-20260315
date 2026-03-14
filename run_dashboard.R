@@ -23,6 +23,8 @@ repeat {
     if (!identical(new_hash, last_hash)) {
       message("Changement détecté → render")
 
+      live_data <- get_live_data(raw_data = df)
+
       rmarkdown::render(
         "Dashboard.Rmd",
         params = list(timestamp = Sys.time())
