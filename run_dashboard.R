@@ -6,11 +6,18 @@ sheet_id <- "1cIiW13JaqudBTFH_Nz23mZhQXeuhXbjASk2SGsVwBX0"
 
 last_hash <- NULL
 
+listes <- c(
+  "ABSTENTION", "B&N", "DESLANDES", "SPILLEBOUT", "DELEMER", "BALY",
+  "SCALI", "MADELAIN", "VALET", "BENYOUCEF", "ADDOUCHE"
+)
+
+source("build/modele.R")
+
 repeat {
   message("Screening des résultats: ", Sys.time())
 
   df <- tryCatch(
-    suppressMessages(read_sheet(sheet_id)),
+    suppressMessages(read_sheet(ss = sheet_id, skip = 2, n_max = 126)),
     error = function(e) {
       message("Erreur lecture Google Sheet: ", e$message)
       return(NULL)
@@ -39,5 +46,5 @@ repeat {
     }
   }
 
-  Sys.sleep(30)
+  Sys.sleep(10)
 }
