@@ -34,4 +34,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 Nowcasting-Lille-20260315.Rproj
-data
+*.html
