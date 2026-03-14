@@ -26,8 +26,13 @@ repeat {
       live_data <- get_live_data(raw_data = df)
 
       rmarkdown::render(
-        "Dashboard.Rmd",
-        params = list(timestamp = Sys.time())
+        input = "Dashboard.Rmd",
+        params = list(
+          timestamp = Sys.time(),
+          live_long = live_data$live_long,
+          meta_all = live_data$meta_all,
+          listes = listes
+        )
       )
 
       last_hash <- digest(df)

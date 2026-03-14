@@ -8,12 +8,14 @@ output:
     theme: cosmo
 params:
   timestamp: NULL
+  live_long: NULL
+  meta_all: NULL
+  listes: NULL
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-
 
 ```{r global, include=FALSE}
 library(tidyverse)
@@ -22,19 +24,83 @@ library(DT)
 library(gt)
 library(scales)
 
-source("build/modele.R")
+live_long <- params$live_long
+meta_all  <- params$meta_all
+listes    <- params$listes
 
-res_k5 <- run_model_selon_k(
-  archfile = archfile_5
-)
+stopifnot(is.data.frame(live_long))
+stopifnot(all(c("bureau_id", "liste", "voix") %in% names(live_long)))
 
-res_k9 <- run_model_selon_k(
-  archfile = archfile_9
-)
+out_k5 <- 
+  archfile_5 |> 
+  run_model_selon_k(
+    live_long = live_long,
+    meta_all = meta_all,
+    listes = listes,
+    theta_current = NULL, 
+    lambda = 1e-4
+  ) |> 
+  get_outputs_from_res()
 
-out_k5 <- get_outputs_from_res(res_k5)
-out_k9 <- get_outputs_from_res(res_k9)
+out_k9 <- 
+  archfile_9 |> 
+  run_model_selon_k(
+    live_long = live_long,
+    meta_all = meta_all,
+    listes = listes,
+    theta_current = NULL, 
+    lambda = 1e-4
+  ) |> 
+  get_outputs_from_res()
+
 ```
+
+# Comparaison
+
+## Row
+
+### Bureaux observés
+
+```{r, echo=FALSE}
+valueBox(
+  value = out_k5[["nb bureaux observés"]],
+  caption = "Bureaux observés",
+  icon = "fa-check"
+)
+```
+
+## Row
+
+### Scores comparés
+
+```{r}
+comp_scores <- 
+  list("k_5"=out_k5,
+       "k_9"=out_k9) |> 
+  map(.f = ~.[["scores par liste"]]) |> 
+  bind_rows(.id = "k")
+
+comp_scores |>
+  select(-voix_proj) |> 
+  pivot_wider(names_from = k, values_from = score, names_prefix = "score_") |> 
+  gt()
+```
+
+### Résultats comparés
+
+```{r}
+comp_res <- 
+  list("k_5"=out_k5,
+       "k_9"=out_k9) |> 
+  map(.f = ~.[["résultats"]]) |> 
+  bind_rows(.id = "k")
+
+comp_res |> 
+  select(-exprimes) |> 
+  pivot_wider(names_from = k, values_from = voix_proj, names_prefix = "voix_") |> 
+  gt()
+```
+
 
 # k = 5
 
@@ -120,38 +186,4 @@ datatable(
     scrollX = TRUE
   )
 )
-```
-
-# Comparaison
-
-## Row
-
-### Scores comparés
-
-```{r}
-comp_scores <- 
-  list("k_5"=out_k5,
-       "k_9"=out_k9) |> 
-  map(.f = ~.[["scores par liste"]]) |> 
-  bind_rows(.id = "k")
-
-comp_scores |>
-  select(-voix_proj) |> 
-  pivot_wider(names_from = k, values_from = score, names_prefix = "score_") |> 
-  gt()
-```
-
-### Résultats comparés
-
-```{r}
-comp_res <- 
-  list("k_5"=out_k5,
-       "k_9"=out_k9) |> 
-  map(.f = ~.[["résultats"]]) |> 
-  bind_rows(.id = "k")
-
-comp_res |> 
-  select(-exprimes) |> 
-  pivot_wider(names_from = k, values_from = voix_proj, names_prefix = "voix_") |> 
-  gt()
 ```
