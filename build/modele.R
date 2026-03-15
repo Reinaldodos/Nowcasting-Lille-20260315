@@ -57,3 +57,33 @@ get_outputs_from_res <- function(res) {
     "scores par liste" = scores_exprimes
   )
 }
+
+run_and_get_model_selon_k <- function(archfile, live_data) {
+  W <-
+    archfile |>
+    create_W()
+
+
+  data_model <-
+    live_data$live_long |>
+    filter(bureau_id %in% rownames(W))
+
+  data_meta <-
+    live_data$meta_all |>
+    filter(bureau_id %in% rownames(W))
+
+  res <-
+    update_projection_long(
+      W = W,
+      live_long = data_model,
+      meta_all = data_meta,
+      category_names = listes
+    )
+
+  get_outputs_from_res(
+    res = res,
+    listes = listes,
+    meta_all = live_data$meta_all,
+    live_long = live_data$live_long
+  )
+}
