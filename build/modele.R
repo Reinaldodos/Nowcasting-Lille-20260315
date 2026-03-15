@@ -17,7 +17,7 @@ run_model_selon_k <- function(live_long,
     )
 }
 
-get_outputs_from_res <- function(res) {
+get_outputs_from_res <- function(res, listes, meta_all, live_long) {
   nb_bdv_obs <- res$projection$observed_bureau_ids |> length()
 
   bdv_proj <-
@@ -33,18 +33,27 @@ get_outputs_from_res <- function(res) {
       x = meta_all,
       by = join_by(bureau_id)
     ) |>
-    mutate(voix_proj = round(part_proj * N)) |>
+    mutate(voix = round(part_proj * N)) |>
+    anti_join(
+      y = live_long,
+      by = join_by(bureau_id)
+    ) |>
+    bind_rows(live_long) |>
+    select(all_of(names(live_long)))
+
+  resultats <-
+    output_inscrits |>
     summarise(
-      voix_proj = sum(voix_proj, na.rm = TRUE),
+      voix = sum(voix, na.rm = TRUE),
       .by = c(liste)
     ) |>
     mutate(exprimes = !liste %in% c("ABSTENTION", "B&N")) |>
-    arrange(-voix_proj)
+    arrange(-voix)
 
   scores_exprimes <-
-    output_inscrits |>
+    resultats |>
     filter(exprimes) |>
-    mutate(score = scales::percent(voix_proj / sum(voix_proj),
+    mutate(score = scales::percent(voix / sum(voix),
       accuracy = .01
     )) |>
     select(-exprimes)
@@ -53,7 +62,7 @@ get_outputs_from_res <- function(res) {
     "modele" = res,
     "nb bureaux observés" = nb_bdv_obs,
     "projection par bureau" = bdv_proj,
-    "résultats" = output_inscrits,
+    "résultats" = resultats |> select(-exprimes),
     "scores par liste" = scores_exprimes
   )
 }
