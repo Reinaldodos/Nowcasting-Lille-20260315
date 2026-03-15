@@ -19,7 +19,7 @@ repeat {
   message("Screening des résultats: ", Sys.time())
 
   df <- tryCatch(
-    suppressMessages(read_sheet(ss = sheet_id, skip = 2, n_max = 126)),
+    suppressMessages(read_sheet(ss = sheet_id, skip = 2)),
     error = function(e) {
       message("Erreur lecture Google Sheet: ", e$message)
       return(NULL)
