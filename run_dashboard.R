@@ -38,8 +38,7 @@ repeat {
         input = "Dashboard.Rmd",
         params = list(
           timestamp = Sys.time(),
-          live_long = live_data$live_long,
-          meta_all = live_data$meta_all,
+          live_data = live_data,
           listes = listes
         )
       )

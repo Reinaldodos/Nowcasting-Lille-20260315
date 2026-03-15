@@ -8,8 +8,7 @@ output:
     theme: cosmo
 params:
   timestamp: NULL
-  live_long: NULL
-  meta_all: NULL
+  live_data: NULL
   listes: NULL
 ---
 
@@ -24,34 +23,20 @@ library(DT)
 library(gt)
 library(scales)
 
-live_long <- params$live_long
+live_data <- params$live_data
 meta_all  <- params$meta_all
 listes    <- params$listes
 
-stopifnot(is.data.frame(live_long))
-stopifnot(all(c("bureau_id", "liste", "voix") %in% names(live_long)))
+stopifnot(is.data.frame(live_data$live_long))
+stopifnot(all(c("bureau_id", "liste", "voix") %in% names(live_data$live_long)))
 
 out_k5 <- 
   archfile_5 |> 
-  run_model_selon_k(
-    live_long = live_long,
-    meta_all = meta_all,
-    listes = listes,
-    theta_current = NULL, 
-    lambda = 1e-4
-  ) |> 
-  get_outputs_from_res()
+  run_and_get_model_selon_k(live_data = live_data)
 
 out_k9 <- 
   archfile_9 |> 
-  run_model_selon_k(
-    live_long = live_long,
-    meta_all = meta_all,
-    listes = listes,
-    theta_current = NULL, 
-    lambda = 1e-4
-  ) |> 
-  get_outputs_from_res()
+  run_and_get_model_selon_k(live_data = live_data)
 
 ```
 
