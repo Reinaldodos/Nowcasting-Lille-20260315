@@ -66,7 +66,7 @@ comp_scores <-
   bind_rows(.id = "k")
 
 comp_scores |>
-  select(-voix_proj) |> 
+  select(-voix) |> 
   pivot_wider(names_from = k, values_from = score, names_prefix = "score_") |> 
   gt()
 ```
@@ -81,8 +81,7 @@ comp_res <-
   bind_rows(.id = "k")
 
 comp_res |> 
-  select(-exprimes) |> 
-  pivot_wider(names_from = k, values_from = voix_proj, names_prefix = "voix_") |> 
+  pivot_wider(names_from = k, values_from = voix, names_prefix = "voix_") |> 
   gt()
 ```
 
